@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { DataContext } from '../context/data-context.js';
-import { FaShoppingCart, FaTag, FaShippingFast, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
+import { FaShoppingCart, FaTag, FaShippingFast, FaCheckCircle, FaTimesCircle, FaCreditCard } from 'react-icons/fa';
 
 const COUPONS = {
   ZAP10: { type: 'percent', value: 10, label: '10% Off' },
@@ -13,6 +13,8 @@ const Cart = () => {
   const [coupon, setCoupon] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [couponMsg, setCouponMsg] = useState('');
+  const [showPayment, setShowPayment] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
 
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   let discount = 0;
@@ -37,6 +39,18 @@ const Cart = () => {
     } else {
       setCouponMsg('Invalid coupon code.');
     }
+  };
+
+  const handlePayment = () => {
+    setShowPayment(true);
+    setTimeout(() => {
+      setPaymentSuccess(true);
+    }, 2000);
+  };
+
+  const closeModal = () => {
+    setShowPayment(false);
+    setPaymentSuccess(false);
   };
 
   return (
@@ -125,10 +139,33 @@ const Cart = () => {
                   <span className="text-red-400">${total.toFixed(2)}</span>
                 </div>
               </div>
-              <button className="bg-red-600 hover:bg-red-700 text-white px-10 py-4 rounded-2xl font-extrabold text-xl shadow-xl transition-all tracking-wide mt-2 flex items-center gap-2">
-                <FaShoppingCart className="text-2xl" /> Make Payment
+              <button className="bg-red-600 hover:bg-red-700 text-white px-10 py-4 rounded-2xl font-extrabold text-xl shadow-xl transition-all tracking-wide mt-2 flex items-center gap-2" onClick={handlePayment}>
+                <FaCreditCard className="text-2xl" /> Make Payment
               </button>
             </div>
+            {/* Fake Payment Modal */}
+            {showPayment && (
+              <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+                <div className="bg-white rounded-3xl shadow-2xl p-10 max-w-md w-full text-center relative">
+                  {!paymentSuccess ? (
+                    <>
+                      <FaCreditCard className="text-5xl text-red-600 mb-4 animate-pulse" />
+                      <h2 className="text-2xl font-bold mb-4">Processing Payment...</h2>
+                      <div className="w-16 h-16 mx-auto mb-4 border-4 border-red-600 border-t-transparent rounded-full animate-spin"></div>
+                      <p className="text-gray-600">Please wait while we process your order.</p>
+                    </>
+                  ) : (
+                    <>
+                      <FaCheckCircle className="text-5xl text-green-500 mb-4 animate-bounce" />
+                      <h2 className="text-2xl font-bold mb-4">Payment Successful!</h2>
+                      <p className="text-gray-700 mb-4">Thank you for shopping with Zaptro.<br/>Your order has been placed.</p>
+                      <button className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-xl font-bold text-lg shadow-lg transition-all" onClick={closeModal}>Continue Shopping</button>
+                    </>
+                  )}
+                  <button className="absolute top-4 right-4 text-gray-400 hover:text-red-600 text-2xl" onClick={closeModal}>&times;</button>
+                </div>
+              </div>
+            )}
           </>
         )}
       </div>
